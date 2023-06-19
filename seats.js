@@ -167,17 +167,19 @@ app.post("/booking", (req, res) => {
         name: req.body.name,
         phone: req.body.phone
     });
-
+    var booking = new Booking(book);
+    booking.save().then(()=>{
+        console.log("booking created");
+    });
     const newVal = book.seat_ids.split(",");
     
 
     for(var i=0; i<newVal.length; i++) {
-        Seat.findOneAndUpdate({seat_id: i}, {booked: true}).then((s)=> {
+        Seat.findOneAndUpdate({seat_id: i}, {booked: true}).then(()=> {
             console.log("The seat is updated to booked");
             client.messages
-                .create({ body: "Your seat " + i + " is booked.", from: "+14068000980", to: "+91"+ book.phone.toString() })
+                .create({ body: "Your seat is booked.", from: "+14068000980", to: "+91"+ book.phone.toString() })
                 .then(message => console.log(message.sid));
-            res.send(s);
         }).catch((err) => {
             console.log("Seat not found");
             console.log(err);
@@ -185,6 +187,13 @@ app.post("/booking", (req, res) => {
     }
 });
 
+
+
+app.get("/booking", (req, res) => {
+    Booking.find().then((b) => {
+        res.json(b);
+    });
+});
 
 
 
